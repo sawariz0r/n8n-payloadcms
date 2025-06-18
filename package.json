@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-payloadcms",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "n8n community node for interacting with Payload CMS",
   "keywords": [
     "n8n-community-node-package"
