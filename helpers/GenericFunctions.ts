@@ -36,3 +36,11 @@ export async function payloadCmsApiRequest(
   // @ts-ignore (n8n request helper handles errors & cookies)
   return this.helpers.request(options);
 }
+
+export async function payloadCmsGraphqlRequest(
+  this: IExecuteFunctions | ILoadOptionsFunctions,
+  query: string,
+  variables: object = {},
+) {
+  return payloadCmsApiRequest.call(this, 'POST', '/graphql', { query, variables });
+}

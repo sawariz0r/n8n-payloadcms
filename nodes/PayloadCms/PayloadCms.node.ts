@@ -1,4 +1,4 @@
-import type { IExecuteFunctions } from 'n8n-workflow';
+import type { IExecuteFunctions, ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import {
 	INodeType,
 	INodeTypeDescription,
@@ -7,7 +7,7 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
-import { payloadCmsApiRequest } from '../../helpers/GenericFunctions';
+import { payloadCmsApiRequest, payloadCmsGraphqlRequest } from '../../helpers/GenericFunctions';
 
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
@@ -18,7 +18,7 @@ export class PayloadCms implements INodeType {
 		icon: 'file:payloadcms.svg',
 		group: ['transform'],
 		version: 1,
-		description: 'Consume the Payload CMS REST API',
+                description: 'Consume the Payload CMS REST and GraphQL APIs',
 		defaults: {
 			name: 'Payload CMS',
 		},
@@ -89,19 +89,23 @@ export class PayloadCms implements INodeType {
 				},
 				default: '',
 			},
-			{
-				displayName: 'JSON Data',
-				name: 'jsonData',
-				description: 'Data for create/update operations (JSON format)',
-				type: 'json',
-				required: true,
-				displayOptions: {
-					show: {
-						operation: ['create', 'update'],
-					},
-				},
-				default: '{}',
-			},
+                        {
+                                displayName: 'JSON Data',
+                                name: 'jsonData',
+                                description: 'Data for create/update operations (JSON format)',
+                                type: 'json',
+                                required: true,
+                                typeOptions: {
+                                        loadOptionsDependsOn: ['collectionSlug'],
+                                        loadOptionsMethod: 'getCollectionTemplate',
+                                },
+                                displayOptions: {
+                                        show: {
+                                                operation: ['create', 'update'],
+                                        },
+                                },
+                                default: '{}',
+                        },
 			{
 				displayName: 'Return All',
 				name: 'returnAll',
@@ -131,8 +135,47 @@ export class PayloadCms implements INodeType {
 					},
 				},
 			},
-		],
-	};
+                ],
+        };
+
+        methods = {
+                loadOptions: {
+                        async getCollectionTemplate(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+                                const slug = (this.getCurrentNodeParameter('collectionSlug') as string) || '';
+                                if (!slug) {
+                                        return [
+                                                {
+                                                        name: 'template',
+                                                        value: '{}',
+                                                },
+                                        ];
+                                }
+                                const typeName = `create${slug.charAt(0).toUpperCase()}${slug.slice(1)}Input`;
+                                const query = `query($name: String!) { __type(name: $name) { inputFields { name } } }`;
+                                try {
+                                        const response = (await payloadCmsGraphqlRequest.call(this, query, { name: typeName })) as any;
+                                        const fields = response?.data?.__type?.inputFields || [];
+                                        const obj: Record<string, unknown> = {};
+                                        for (const f of fields) {
+                                                if (!['locale', 'fallbackLocale', 'draft'].includes(f.name)) obj[f.name] = '';
+                                        }
+                                        return [
+                                                {
+                                                        name: 'template',
+                                                        value: JSON.stringify(obj, null, 2),
+                                                },
+                                        ];
+                                } catch (e) {
+                                        return [
+                                                {
+                                                        name: 'template',
+                                                        value: '{}',
+                                                },
+                                        ];
+                                }
+                        },
+                },
+        };
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
