@@ -14,7 +14,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - Get a collection entry
 - Get many collection entries
 - Update collection entries
-- Fetch collection schema for JSON pre-fill
+- Get collection schema template
 
 ## Credentials
 

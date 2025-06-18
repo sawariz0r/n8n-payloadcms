@@ -1,4 +1,4 @@
-import type { IExecuteFunctions, ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
+import type { IExecuteFunctions, ILoadOptionsFunctions, INodePropertyOptions, IDataObject } from 'n8n-workflow';
 import {
 	INodeType,
 	INodeTypeDescription,
@@ -55,11 +55,12 @@ export class PayloadCms implements INodeType {
 					},
 				},
 				options: [
-					{ name: 'Create', value: 'create', action: 'Create a collection entry' },
-					{ name: 'Delete', value: 'delete', action: 'Delete a collection entry' },
-					{ name: 'Get', value: 'get', action: 'Get a collection entry' },
-					{ name: 'Get Many', value: 'getAll', action: 'Get many collection entries' },
-					{ name: 'Update', value: 'update', action: 'Update a collection entry' },
+                                       { name: 'Create', value: 'create', action: 'Create a collection entry' },
+                                       { name: 'Delete', value: 'delete', action: 'Delete a collection entry' },
+                                       { name: 'Get', value: 'get', action: 'Get a collection entry' },
+                                       { name: 'Get Many', value: 'getAll', action: 'Get many collection entries' },
+                                       { name: 'Get Template', value: 'template', action: 'Get collection schema template' },
+                                       { name: 'Update', value: 'update', action: 'Update a collection entry' },
 				],
 				default: 'getAll',
 			},
@@ -155,7 +156,7 @@ export class PayloadCms implements INodeType {
                                 try {
                                         const response = (await payloadCmsGraphqlRequest.call(this, query, { name: typeName })) as any;
                                         const fields = response?.data?.__type?.inputFields || [];
-                                        const obj: Record<string, unknown> = {};
+                                        const obj: IDataObject = {};
                                         for (const f of fields) {
                                                 if (!['locale', 'fallbackLocale', 'draft'].includes(f.name)) obj[f.name] = '';
                                         }
@@ -182,15 +183,29 @@ export class PayloadCms implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 
 		for (let i = 0; i < items.length; i++) {
-			const resource = this.getNodeParameter('resource', i) as string;
-			const operation = this.getNodeParameter('operation', i) as string;
+                        const resource = this.getNodeParameter('resource', i) as string;
+                        const operation = this.getNodeParameter('operation', i) as string;
 
-			if (resource === 'collection') {
-				const collectionSlug = this.getNodeParameter('collectionSlug', i) as string;
-				let endpoint = `/${collectionSlug}`;
-				let method: HttpMethod = 'GET';
-				let body: Record<string, unknown> = {};
-				let qs: Record<string, unknown> = {};
+                        if (resource === 'collection') {
+                                const collectionSlug = this.getNodeParameter('collectionSlug', i) as string;
+
+                                if (operation === 'template') {
+                                        const typeName = `create${collectionSlug.charAt(0).toUpperCase()}${collectionSlug.slice(1)}Input`;
+                                        const query = `query($name: String!) { __type(name: $name) { inputFields { name } } }`;
+                                        const response = (await payloadCmsGraphqlRequest.call(this, query, { name: typeName })) as any;
+                                        const fields = response?.data?.__type?.inputFields || [];
+                                        const obj: IDataObject = {};
+                                        for (const f of fields) {
+                                                if (!['locale', 'fallbackLocale', 'draft'].includes(f.name)) obj[f.name] = '';
+                                        }
+                                        returnData.push({ json: obj });
+                                        continue;
+                                }
+
+                                let endpoint = `/${collectionSlug}`;
+                                let method: HttpMethod = 'GET';
+                                let body: Record<string, unknown> = {};
+                                let qs: Record<string, unknown> = {};
 
 				switch (operation) {
 					case 'create':
