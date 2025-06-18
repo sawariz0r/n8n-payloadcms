@@ -145,7 +145,7 @@ export class PayloadCms implements INodeType {
                                 if (!slug) {
                                         return [
                                                 {
-                                                        name: 'template',
+                                                        name: 'Template',
                                                         value: '{}',
                                                 },
                                         ];
@@ -161,14 +161,14 @@ export class PayloadCms implements INodeType {
                                         }
                                         return [
                                                 {
-                                                        name: 'template',
+                                                        name: 'Template',
                                                         value: JSON.stringify(obj, null, 2),
                                                 },
                                         ];
                                 } catch (e) {
                                         return [
                                                 {
-                                                        name: 'template',
+                                                        name: 'Template',
                                                         value: '{}',
                                                 },
                                         ];
