@@ -1,6 +1,7 @@
 # n8n-nodes-payloadcms
 
 This package provides a community node to interact with the [Payload CMS](https://payloadcms.com/) API from within [n8n](https://n8n.io/).
+It performs data operations over REST and uses the CMS GraphQL endpoint to prefetch collection schemas for JSON template generation.
 
 ## Installation
 
@@ -13,6 +14,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - Get a collection entry
 - Get many collection entries
 - Update collection entries
+- Fetch collection schema for JSON pre-fill
 
 ## Credentials
 
@@ -32,4 +34,4 @@ The node follows the standard n8n community node structure. It includes:
 - `helpers/GenericFunctions.ts` – request helper
 - `nodes/PayloadCms/PayloadCms.node.ts` – the node itself
 
-Use it to create, read, update and delete entries in your Payload CMS collections.
+Use it to create, read, update and delete entries in your Payload CMS collections. When creating entries, the JSON field can be pre-filled by fetching the collection schema via GraphQL.
