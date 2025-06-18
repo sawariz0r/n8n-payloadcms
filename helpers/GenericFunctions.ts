@@ -5,7 +5,6 @@ export async function payloadCmsApiRequest(
   this: IExecuteFunctions | ILoadOptionsFunctions,
   method: string,
   endpoint: string,
-  collectionSlug: string,
   body: object = {},
   qs: object = {},
   headers: Record<string, string | number> = {},
@@ -13,9 +12,10 @@ export async function payloadCmsApiRequest(
 ) {
   const credentials = await this.getCredentials('payloadCmsApi');
   const baseUrl = (credentials.baseUrl as string).replace(/\/$/, '');
+  const authCollection = credentials.authCollection as string;
 
   const defaultHeaders = {
-    Authorization: `${collectionSlug} API-Key ${credentials.apiKey}`,
+    Authorization: `${authCollection} API-Key ${credentials.apiKey}`,
     'Content-Type': 'application/json',
   };
 

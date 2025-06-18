@@ -5,24 +5,32 @@ export class PayloadCmsApi implements ICredentialType {
 	displayName = 'Payload CMS API';
 	documentationUrl = 'https://payloadcms.com/docs/authentication/api-keys';
 	dummy = false;
-	properties: INodeProperties[] = [
-		{
-			displayName: 'Base URL',
-			name: 'baseUrl',
-			description: 'Root URL of your Payload installation, e.g. https://cms.example.com',
-			type: 'string',
-			default: '',
-			placeholder: 'https://cms.example.com',
-		},
-		{
-			displayName: 'API Key',
-			name: 'apiKey',
-			description: 'API key created in Payload ➜ Access ➜ API Keys',
-			type: 'string',
-			typeOptions: {
-				password: true,
-			},
-			default: '',
-		},
-	];
+        properties: INodeProperties[] = [
+                {
+                        displayName: 'Base URL',
+                        name: 'baseUrl',
+                        description: 'Root URL of your Payload installation, e.g. https://cms.example.com',
+                        type: 'string',
+                        default: '',
+                        placeholder: 'https://cms.example.com',
+                },
+                {
+                        displayName: 'API Key',
+                        name: 'apiKey',
+                        description: 'API key created in Payload ➜ Access ➜ API Keys',
+                        type: 'string',
+                        typeOptions: {
+                                password: true,
+                        },
+                        default: '',
+                },
+                {
+                        displayName: 'Auth Collection Slug',
+                        name: 'authCollection',
+                        description: 'Slug of the collection that has auth.useAPIKey enabled',
+                        type: 'string',
+                        default: 'users',
+                        placeholder: 'users',
+                },
+        ];
 }

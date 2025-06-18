@@ -16,7 +16,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Credentials
 
-Create an API key in Payload CMS and enter your CMS base URL and key in the node credentials. The node sends requests with an `Authorization` header in the format `<collection-slug> API-Key <token>` as required by Payload CMS.
+Create an API key in Payload CMS and enter your CMS base URL, the API key enabled collection slug, and the key itself in the node credentials. The node sends requests with an `Authorization` header in the format `<api-key-collection> API-Key <token>` as required by Payload CMS.
 
 ## Development
 

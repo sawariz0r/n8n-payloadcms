@@ -180,7 +180,6 @@ export class PayloadCms implements INodeType {
                                         this,
                                         method,
                                         endpoint,
-                                        collectionSlug,
                                         body,
                                         qs,
                                 );
